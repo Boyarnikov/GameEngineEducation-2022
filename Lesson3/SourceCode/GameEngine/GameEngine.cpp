@@ -13,6 +13,7 @@
 #include "GameTimer.h"
 #include "InputHandler.h"
 
+#include <vector>
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -30,13 +31,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     RenderThread* renderThread = renderEngine->GetRT();
     InputHandler* inputHandler = new InputHandler();
 
-    GameObject* cube = new CubeGameObject();
-    renderThread->EnqueueCommand(RC_CreateCubeRenderObject, cube->GetRenderProxy());
-
     MSG msg = { 0 };
 
     timer.Start();
     timer.Reset();
+
+    const int N = 100;
+    CubeGameObject* cubes[N];
+    std::srand(std::time(nullptr));
+
+    std::vector<CubeGameObject*> inputSubscribers;
+
+    for (int i = 0; i < N; i++) {
+        int rand = std::rand() % 3;
+
+        if (rand == 0) 
+            cubes[i] = new MoveCube(timer.TotalTime());
+        else if (rand == 1)
+            cubes[i] = new JumpCube(timer.TotalTime());
+        else {
+            cubes[i] = new ControlCube(timer.TotalTime());
+            inputSubscribers.push_back(cubes[i]);
+        }
+        renderThread->EnqueueCommand(RC_CreateCubeRenderObject, cubes[i]->GetRenderProxy());
+
+        cubes[i]->SetPosition(4.0f * (i % 20) - 40.f, -50.0f, (i / 20) * 4.f);
+    }
+
 
     float newPositionX = 0.0f;
 
@@ -51,18 +72,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         else
         {
             inputHandler->Update();
-
+            
             float t = 0;
             timer.Tick();
-            t = sin(timer.TotalTime())*2;
-
-            float velocity = 0.0f;
+            
             if (inputHandler->GetInputState().test(eIC_GoLeft))
-                velocity -= 1.0f;
+                for (auto& cube : cubes) {
+                    cube->Event(timer.TotalTime(), timer.DeltaTime(), eIC_GoLeft);
+                }
             if (inputHandler->GetInputState().test(eIC_GoRight))
-                velocity += 1.0f;
-            newPositionX += velocity * timer.DeltaTime();
-            cube->SetPosition(newPositionX, 0.0f, 0.0f);
+                for (auto& cube : cubes) {
+                    cube->Event(timer.TotalTime(), timer.DeltaTime(), eIC_GoRight);
+                }
+
+            for (auto& cube : cubes) {
+                cube->Update(timer.TotalTime(), timer.DeltaTime());
+            }
 
             renderThread->OnEndFrame();
         }
