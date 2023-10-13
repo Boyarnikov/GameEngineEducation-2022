@@ -3,21 +3,21 @@
 #include "ecsPhys.h"
 #include "flecs.h"
 #include "../InputHandler.h"
+#include "../ScriptSystem/IScriptProxy.h"
 
 void register_ecs_control_systems(flecs::world &ecs)
 {
+  static auto scriptsQuery = ecs.query<ScriptPtr>();
   static auto inputQuery = ecs.query<InputHandlerPtr>();
   ecs.system<Velocity, const Speed, const Controllable>()
     .each([&](flecs::entity e, Velocity &vel, const Speed &spd, const Controllable &)
     {
       inputQuery.each([&](InputHandlerPtr input)
       {
-        float deltaVel = 0.f;
-        if (input.ptr->GetInputState().test(eIC_GoLeft))
-          deltaVel -= spd;
-        if (input.ptr->GetInputState().test(eIC_GoRight))
-          deltaVel += spd;
-        vel.x += deltaVel * e.delta_time();
+        scriptsQuery.each([&](ScriptPtr script)
+            {
+                vel.x = spd * script.ptr->Update(input.ptr->GetInputState().test(eIC_GoLeft), input.ptr->GetInputState().test(eIC_GoRight), vel.x, e.delta_time());
+            });
       });
     });
 

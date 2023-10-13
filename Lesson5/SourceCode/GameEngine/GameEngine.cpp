@@ -32,7 +32,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     InputHandler* inputHandler = new InputHandler();
     CScriptSystem* scriptSystem = new CScriptSystem();
 
-    EntitySystem* entitySystem = new EntitySystem(renderEngine, inputHandler);
+    IScriptProxy* scriptsProxy = scriptSystem->CreateProxy("../../../Assets/scripts/movable.lua");
+
+    EntitySystem* entitySystem = new EntitySystem(renderEngine, inputHandler, scriptsProxy);
 
     MSG msg = { 0 };
 
@@ -50,7 +52,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         else
         {
             inputHandler->Update();
-            scriptSystem->Update();
+            //scriptSystem->Update();
             entitySystem->Update();
 
             timer.Tick();
