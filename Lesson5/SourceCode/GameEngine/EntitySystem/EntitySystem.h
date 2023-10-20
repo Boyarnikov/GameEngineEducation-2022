@@ -12,6 +12,7 @@ public:
 
 	void Update();
 private:
+	void LoadXMLObject(const char* file);
 	flecs::world ecs;
 };
 

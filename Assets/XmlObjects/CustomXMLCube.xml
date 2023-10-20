@@ -1,0 +1,34 @@
+<entity>
+
+	<cube/>
+
+	<position>
+		<x>-2.0</x>
+		<y>1.0</y>
+		<z>0.0</z>
+	</position>
+
+	<gravity>
+		<x>0.0</x>
+		<y>-10</y>
+		<z>0.0</z>
+	</gravity>
+
+	<bounciness>
+		<v>1.0</v>
+	</bounciness>
+
+	<bounce_plane>
+		<x>0.0</x>
+		<y>1.0</y>
+		<z>0.0</z>
+		<w>0.0</w>
+	</bounce_plane>
+
+	<velocity>
+		<x>1.0</x>
+		<y>0.0</y>
+		<z>0.5</z>
+	</velocity>
+
+</entity>
