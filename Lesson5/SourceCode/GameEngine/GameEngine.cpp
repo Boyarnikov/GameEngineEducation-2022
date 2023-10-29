@@ -30,7 +30,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     RenderEngine* renderEngine = new RenderEngine(hInstance);
     RenderThread* renderThread = renderEngine->GetRT();
     InputHandler* inputHandler = new InputHandler();
-    CScriptSystem* scriptSystem = new CScriptSystem();
 
     EntitySystem* entitySystem = new EntitySystem(renderEngine, inputHandler);
 
@@ -50,7 +49,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         else
         {
             inputHandler->Update();
-            scriptSystem->Update();
             entitySystem->Update();
 
             timer.Tick();
